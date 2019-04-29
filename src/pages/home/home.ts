@@ -27,49 +27,104 @@ export class HomePage {
       .then((db: SQLiteObject) => {
         console.log("DB criado");
 
-        db.sqlBatch([
-          [
-            "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, amount DECIMAL, description TEXT)"
-          ]
-        ])
-          .then(() => {
-            console.log("Tabelas criadas");
+        this.createTable(db).then(() => {
+          console.log("Tabelas criadas");
 
-            const v1 = 100.2;
-            const v2 = "Teste 3";
+          const v1 = 99.2;
+          const v2 = "Teste 4";
 
-            const sqlInsert =
-              "INSERT INTO entries (amount, description) VALUES (?, ?)";
-            const dataInsert = [v1, v2];
+          this.insert(db, v1, v2).then(() => {
+            console.log("Valores inseridos");
 
-            db.executeSql(sqlInsert, dataInsert)
-              .then(() => {
-                console.log("Valores inseridos");
+            this.select(db).then((values: any) => {
+              console.log(values.rows.length);
+              console.log("select 1");
 
-                const sql = "SELECT amount, description FROM entries;";
-                const data = [];
+              for (var i = 0; i < values.rows.length; i++) {
+                console.log(JSON.stringify(values.rows.item(i)));
+              }
 
-                db.executeSql(sql, data).then((values: any) => {
+              this.update(db, 999, "alterado", 5).then(() => {
+                this.select(db).then((values: any) => {
                   console.log(values.rows.length);
+                  console.log("select 2");
 
                   for (var i = 0; i < values.rows.length; i++) {
                     console.log(JSON.stringify(values.rows.item(i)));
                   }
+
+                  this.delete(db, 6).then(() => {
+                    this.select(db).then((values: any) => {
+                      console.log(values.rows.length);
+                      console.log("select 3");
+
+                      for (var i = 0; i < values.rows.length; i++) {
+                        console.log(JSON.stringify(values.rows.item(i)));
+                      }
+                    });
+                  });
                 });
-              })
-              .catch(e => {
-                console.error(
-                  "erro ao inserir os valores no banco de dados",
-                  JSON.stringify(e)
-                );
               });
-          })
-          .catch(e => {
-            console.error("erro ao executar o comando SQL", JSON.stringify(e));
+            });
           });
+        });
       })
       .catch(() => {
         console.error("Erro ao criar o BD.");
       });
+  }
+
+  createTable(db) {
+    console.log("DB criado");
+
+    return db
+      .sqlBatch([
+        "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, amount DECIMAL, description TEXT)"
+      ])
+      .catch(e => console.error("erro ao criar a tabela", JSON.stringify(e)));
+  }
+
+  insert(db, v1, v2) {
+    const sql = "INSERT INTO entries (amount, description) VALUES (?, ?)";
+    const data = [v1, v2];
+
+    return db
+      .executeSql(sql, data)
+      .catch(e =>
+        console.error("erro ao inserir na tabela", JSON.stringify(e))
+      );
+  }
+
+  update(db, v1, v2, id) {
+    const sql = "UPDATE entries set amount = ?, description = ? WHERE id = ?";
+    const data = [v1, v2, id];
+
+    return db
+      .executeSql(sql, data)
+      .catch(e =>
+        console.error("erro ao atualizar registro na tabela", JSON.stringify(e))
+      );
+  }
+
+  delete(db, id) {
+    const sql = "DELETE FROM entries WHERE id = ?";
+    const data = [id];
+
+    return db
+      .executeSql(sql, data)
+      .catch(e =>
+        console.error("erro ao excluir registro na tabela", JSON.stringify(e))
+      );
+  }
+
+  select(db) {
+    const sql = "SELECT id, amount, description FROM entries;";
+    const data = [];
+
+    return db
+      .executeSql(sql, data)
+      .catch(e =>
+        console.error("erro ao buscar registros na tabela", JSON.stringify(e))
+      );
   }
 }
