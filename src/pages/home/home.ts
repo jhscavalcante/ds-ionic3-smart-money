@@ -27,80 +27,22 @@ export class HomePage {
       .then((db: SQLiteObject) => {
         console.log("DB criado");
 
-        db.sqlBatch([
-          [
-            "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, amount DECIMAL, description TEXT)"
-          ],
-          [
-            "INSERT INTO entries (amount, description) VALUES (?, ?)",
-            [12, "teste 12"]
-          ],
-          [
-            "INSERT INTO entries (amount, description) VALUES (?, ?)",
-            [13, "teste 13"]
-          ],
-          ["UPDATE entries set amount = ? WHERE id = ?", [3, 10]]
-        ])
-          .then(() => {
-            this.select(db).then((values: any) => {
-              console.log(values.rows.length);
-              console.log("select do sqlBatch");
-
-              for (var i = 0; i < values.rows.length; i++) {
-                console.log(JSON.stringify(values.rows.item(i)));
-              }
-            });
-          })
-          .catch(e =>
-            console.error(
-              "erro ao executar lote (sqlBatch) de processamento",
-              JSON.stringify(e)
-            )
-          );
-
-        /*
         this.createTable(db).then(() => {
           console.log("Tabelas criadas");
 
-          const v1 = 99.2;
-          const v2 = "Teste 4";
+          this.select(db).then((values: any) => {
+            for (var i = 0; i < values.rows.length; i++) {
+              console.log(JSON.stringify(values.rows.item(i)));
+            }
 
-          this.insert(db, v1, v2).then(() => {
-            console.log("Valores inseridos");
-
-            this.select(db).then((values: any) => {
-              console.log(values.rows.length);
-              console.log("select 1");
-
-              for (var i = 0; i < values.rows.length; i++) {
-                console.log(JSON.stringify(values.rows.item(i)));
+            this.balance(db).then((values: any) => {
+              if (values.rows.length > 0) {
+                const item = values.rows.item(0);
+                console.log("Saldo atual: ", JSON.stringify(item.balance));
               }
-
-              this.update(db, 999, "alterado", 5).then(() => {
-                this.select(db).then((values: any) => {
-                  console.log(values.rows.length);
-                  console.log("select 2");
-
-                  for (var i = 0; i < values.rows.length; i++) {
-                    console.log(JSON.stringify(values.rows.item(i)));
-                  }
-
-                  this.delete(db, 6).then(() => {
-                    this.select(db).then((values: any) => {
-                      console.log(values.rows.length);
-                      console.log("select 3");
-
-                      for (var i = 0; i < values.rows.length; i++) {
-                        console.log(JSON.stringify(values.rows.item(i)));
-                      }
-                    });
-                  });
-                });
-              });
             });
           });
         });
-        */
       })
       .catch(() => {
         console.error("Erro ao criar o BD.");
@@ -158,6 +100,17 @@ export class HomePage {
       .executeSql(sql, data)
       .catch(e =>
         console.error("erro ao buscar registros na tabela", JSON.stringify(e))
+      );
+  }
+
+  balance(db) {
+    const sql = "SELECT sum(amount) as balance FROM entries;";
+    const data = [];
+
+    return db
+      .executeSql(sql, data)
+      .catch(e =>
+        console.error("erro ao buscar o balance na tabela", JSON.stringify(e))
       );
   }
 }
