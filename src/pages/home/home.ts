@@ -27,6 +27,38 @@ export class HomePage {
       .then((db: SQLiteObject) => {
         console.log("DB criado");
 
+        db.sqlBatch([
+          [
+            "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, amount DECIMAL, description TEXT)"
+          ],
+          [
+            "INSERT INTO entries (amount, description) VALUES (?, ?)",
+            [12, "teste 12"]
+          ],
+          [
+            "INSERT INTO entries (amount, description) VALUES (?, ?)",
+            [13, "teste 13"]
+          ],
+          ["UPDATE entries set amount = ? WHERE id = ?", [3, 10]]
+        ])
+          .then(() => {
+            this.select(db).then((values: any) => {
+              console.log(values.rows.length);
+              console.log("select do sqlBatch");
+
+              for (var i = 0; i < values.rows.length; i++) {
+                console.log(JSON.stringify(values.rows.item(i)));
+              }
+            });
+          })
+          .catch(e =>
+            console.error(
+              "erro ao executar lote (sqlBatch) de processamento",
+              JSON.stringify(e)
+            )
+          );
+
+        /*
         this.createTable(db).then(() => {
           console.log("Tabelas criadas");
 
@@ -68,6 +100,7 @@ export class HomePage {
             });
           });
         });
+        */
       })
       .catch(() => {
         console.error("Erro ao criar o BD.");
