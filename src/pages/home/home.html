@@ -1,14 +1,26 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic Blank
+      Smart Money
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+  <h1>Saldo: R$ 2.201,45</h1>
+  <button (click)="addEntry()">Adicionar</button>
+  <button (click)="testeDb()">Teste de Banco de Dados</button>
+
+  <h3>Categorias</h3>
+  <ul>
+    <li>Alimentação: R$ 200,00</li>
+    <li>Combustível: R$ 12,00</li>
+    <li>Aluguel: R$ 120,00</li>
+  </ul>
+
+  <h3>Últimos Lançamentos</h3>
+  <ul>
+    <li>Padaria Asa: $10</li>
+    <li>Supermercado Isadora: $190</li>
+  </ul>
 </ion-content>
