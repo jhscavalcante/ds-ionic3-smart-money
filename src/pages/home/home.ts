@@ -9,11 +9,21 @@ import { SQLite, SQLiteObject } from "@ionic-native/sqlite";
   templateUrl: "home.html"
 })
 export class HomePage {
+  dados = [
+    "Padaria Asa: R$10",
+    "Supermercado Isadora: R$190",
+    "Posto Ipiranga: R$50"
+  ];
+
   constructor(public navCtrl: NavController, public sqlite: SQLite) {}
 
   addEntry() {
     console.log("Adicionar Lançamento");
     this.navCtrl.push(NewEntryPage); // abre uma tela
+  }
+
+  addData() {
+    this.dados.push("Outro Lançamento estático: R$ 1,00");
   }
 
   testeDb() {

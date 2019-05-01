@@ -8,7 +8,8 @@
 
 <ion-content padding>
   <h1>Saldo: R$ 2.201,45</h1>
-  <button (click)="addEntry()">Adicionar</button>  
+  <button (click)="addEntry()">Adicionar</button>
+  <button (click)="addData()">Adicionar Valor Estático aos Lançamentos</button>
 
   <h3>Categorias</h3>
   <ul>
@@ -19,7 +20,8 @@
 
   <h3>Últimos Lançamentos</h3>
   <ul>
-    <li>Padaria Asa: $10</li>
-    <li>Supermercado Isadora: $190</li>
+    <li *ngFor="let dado of dados">
+      {{ dado }}
+    </li>
   </ul>
 </ion-content>
