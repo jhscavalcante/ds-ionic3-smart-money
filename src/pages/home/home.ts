@@ -42,7 +42,8 @@ export class HomePage {
               registro = values.rows.item(i);
 
               console.log(JSON.stringify(registro));
-              info = registro["description"] + ": " + registro["amount"];
+              info = `${registro["description"]} : ${registro["amount"]}`;
+              //info = registro["description"] + ": " + registro["amount"];
               this.dados.push(info);
             }
           })
