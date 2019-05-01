@@ -9,11 +9,7 @@ import { SQLite, SQLiteObject } from "@ionic-native/sqlite";
   templateUrl: "home.html"
 })
 export class HomePage {
-  dados = [
-    "Padaria Asa: R$10",
-    "Supermercado Isadora: R$190",
-    "Posto Ipiranga: R$50"
-  ];
+  dados = [];
 
   constructor(public navCtrl: NavController, public sqlite: SQLite) {}
 
@@ -23,7 +19,40 @@ export class HomePage {
   }
 
   addData() {
-    this.dados.push("Outro Lançamento estático: R$ 1,00");
+    console.log("Início do Teste DB");
+
+    this.sqlite
+      .create({
+        name: "data.db",
+        location: "default"
+      })
+      .then((db: SQLiteObject) => {
+        console.log("DB criado");
+
+        const sql = "SELECT * FROM entries;";
+        const data = [];
+
+        return db
+          .executeSql(sql, data)
+          .then((values: any) => {
+            let registro;
+            let info;
+
+            for (var i = 0; i < values.rows.length; i++) {
+              registro = values.rows.item(i);
+
+              console.log(JSON.stringify(registro));
+              info = registro["description"] + ": " + registro["amount"];
+              this.dados.push(info);
+            }
+          })
+          .catch(e =>
+            console.error(
+              "erro ao buscar registros na tabela",
+              JSON.stringify(e)
+            )
+          );
+      });
   }
 
   testeDb() {
