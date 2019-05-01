@@ -9,16 +9,20 @@ import { SQLite, SQLiteObject } from "@ionic-native/sqlite";
   templateUrl: "home.html"
 })
 export class HomePage {
-  dados = [];
+  entries = [];
 
   constructor(public navCtrl: NavController, public sqlite: SQLite) {}
+
+  ionViewDidEnter() {
+    this.loadData();
+  }
 
   addEntry() {
     console.log("Adicionar Lançamento");
     this.navCtrl.push(NewEntryPage); // abre uma tela
   }
 
-  addData() {
+  loadData() {
     console.log("Início do Teste DB");
 
     this.sqlite
@@ -35,16 +39,12 @@ export class HomePage {
         return db
           .executeSql(sql, data)
           .then((values: any) => {
-            let registro;
-            let info;
+            let data;
 
             for (var i = 0; i < values.rows.length; i++) {
-              registro = values.rows.item(i);
-
-              console.log(JSON.stringify(registro));
-              info = `${registro["description"]} : ${registro["amount"]}`;
-              //info = registro["description"] + ": " + registro["amount"];
-              this.dados.push(info);
+              data = values.rows.item(i);
+              console.log(JSON.stringify(data));
+              this.entries.push(data); // passando um objeto para o array
             }
           })
           .catch(e =>
