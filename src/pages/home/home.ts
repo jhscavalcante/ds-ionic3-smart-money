@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { NavController } from "ionic-angular";
 import { NewEntryPage } from "../new-entry/new-entry";
 
-import { SQLite, SQLiteObject } from "@ionic-native/sqlite";
+import { DatabaseProvider } from "../../providers/database/database";
 
 @Component({
   selector: "page-home",
@@ -11,94 +11,46 @@ import { SQLite, SQLiteObject } from "@ionic-native/sqlite";
 export class HomePage {
   entries = [];
 
-  constructor(public navCtrl: NavController, public sqlite: SQLite) {}
+  constructor(
+    public navCtrl: NavController,
+    public database: DatabaseProvider
+  ) {}
 
   ionViewDidEnter() {
     this.loadData();
   }
 
   addEntry() {
-    console.log("Adicionar Lançamento");
-    this.navCtrl.push(NewEntryPage); // abre uma tela
+    this.navCtrl.push(NewEntryPage); // abre a tela (Adicionar Lançamentos)
   }
 
   loadData() {
     console.log("Início do Teste DB");
 
-    this.sqlite
-      .create({
-        name: "data.db",
-        location: "default"
+    const sql = "SELECT * FROM entries;";
+    const data = [];
+
+    return this.database.db
+      .executeSql(sql, data)
+      .then((values: any) => {
+        let data;
+        this.entries = [];
+
+        for (var i = 0; i < values.rows.length; i++) {
+          data = values.rows.item(i);
+          console.log(JSON.stringify(data));
+          this.entries.push(data); // passando um objeto para o array
+        }
       })
-      .then((db: SQLiteObject) => {
-        console.log("DB criado");
-
-        const sql = "SELECT * FROM entries;";
-        const data = [];
-
-        return db
-          .executeSql(sql, data)
-          .then((values: any) => {
-            let data;
-
-            for (var i = 0; i < values.rows.length; i++) {
-              data = values.rows.item(i);
-              console.log(JSON.stringify(data));
-              this.entries.push(data); // passando um objeto para o array
-            }
-          })
-          .catch(e =>
-            console.error(
-              "erro ao buscar registros na tabela",
-              JSON.stringify(e)
-            )
-          );
-      });
+      .catch(e =>
+        console.error(
+          "[ENTRIES] erro ao buscar registros na tabela",
+          JSON.stringify(e)
+        )
+      );
   }
 
-  testeDb() {
-    console.log("Início do Teste DB");
-
-    this.sqlite
-      .create({
-        name: "data.db",
-        location: "default"
-      })
-      .then((db: SQLiteObject) => {
-        console.log("DB criado");
-
-        this.createTable(db).then(() => {
-          console.log("Tabelas criadas");
-
-          this.select(db).then((values: any) => {
-            for (var i = 0; i < values.rows.length; i++) {
-              console.log(JSON.stringify(values.rows.item(i)));
-            }
-
-            this.balance(db).then((values: any) => {
-              if (values.rows.length > 0) {
-                const item = values.rows.item(0);
-                console.log("Saldo atual: ", JSON.stringify(item.balance));
-              }
-            });
-          });
-        });
-      })
-      .catch(() => {
-        console.error("Erro ao criar o BD.");
-      });
-  }
-
-  createTable(db) {
-    console.log("DB criado");
-
-    return db
-      .sqlBatch([
-        "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, amount DECIMAL, description TEXT)"
-      ])
-      .catch(e => console.error("erro ao criar a tabela", JSON.stringify(e)));
-  }
-
+  /*
   insert(db, v1, v2) {
     const sql = "INSERT INTO entries (amount, description) VALUES (?, ?)";
     const data = [v1, v2];
@@ -153,4 +105,5 @@ export class HomePage {
         console.error("erro ao buscar o balance na tabela", JSON.stringify(e))
       );
   }
+  */
 }

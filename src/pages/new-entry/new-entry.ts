@@ -6,8 +6,7 @@ import {
   Validators,
   FormBuilder
 } from "@angular/forms";
-
-import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
+import { DatabaseProvider } from "../../providers/database/database";
 
 @IonicPage()
 @Component({
@@ -15,15 +14,16 @@ import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
   templateUrl: "new-entry.html"
 })
 export class NewEntryPage {
+  categories = [];
   entryForm: FormGroup;
 
-  entry = { };
+  entry = {};
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private builder: FormBuilder,
-    public sqlite: SQLite
+    public database: DatabaseProvider,
+    private builder: FormBuilder
   ) {
     this.entryForm = builder.group({
       amount: new FormControl(
@@ -37,7 +37,9 @@ export class NewEntryPage {
     });
   }
 
-  ionViewDidLoad() {}
+  ionViewDidLoad() {
+    this.loadData();
+  }
 
   submitForm() {
     console.log("Enviando dados...");
@@ -53,32 +55,43 @@ export class NewEntryPage {
     this.navCtrl.pop(); //fecha a tela
   }
 
-  insertBD(){
-    console.log('Início da gravação do BD');
+  loadData() {
+    console.log("Início do Teste DB");
 
-    this.sqlite.create({
-      name: 'data.db',
-      location: 'default'
-    })
-    .then((db: SQLiteObject) => {
-      console.log('bd criado');
+    const sql = "SELECT * FROM categories;";
+    const data = [];
 
-      db.sqlBatch([
-        "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, amount DECIMAL, description TEXT)"
-      ])
-      .then(() => {
+    return this.database.db
+      .executeSql(sql, data)
+      .then((values: any) => {
+        let data;
+        this.categories = [];
 
-        const sql = "INSERT INTO entries (amount) VALUES (?)";
-        const data = [this.entry['amount']];
-    
-        return db
-          .executeSql(sql, data)
-          .then(() => console.log('insert realizado com sucesso'))
-          .catch(e => console.error("erro ao inserir na tabela", JSON.stringify(e)));
-        
+        for (var i = 0; i < values.rows.length; i++) {
+          data = values.rows.item(i);
+          console.log(JSON.stringify(data));
+          this.categories.push(data); // passando um objeto para o array
+        }
       })
-      .catch(e => console.error("erro ao criar a tabela", JSON.stringify(e)));
+      .catch(e =>
+        console.error(
+          "[ENTRIES] erro ao buscar registros na tabela",
+          JSON.stringify(e)
+        )
+      );
+  }
 
-    });
+  insertBD() {
+    console.log("Início da gravação do BD");
+
+    const sql = "INSERT INTO entries (amount, entry_at) VALUES (?, ?)";
+    const data = [this.entry["amount"], 1];
+
+    return this.database.db
+      .executeSql(sql, data)
+      .then(() => console.log("[ENTRIES] insert realizado com sucesso"))
+      .catch(e =>
+        console.error("[ENTRIES] erro ao inserir na tabela", JSON.stringify(e))
+      );
   }
 }
