@@ -6,7 +6,9 @@ import {
   Validators,
   FormBuilder
 } from "@angular/forms";
-import { DatabaseProvider } from "../../providers/database/database";
+
+import { CategoryDaoProvider } from "../../providers/category-dao/category-dao";
+import { AccountProvider } from "../../providers/account/account";
 
 @IonicPage()
 @Component({
@@ -22,7 +24,8 @@ export class NewEntryPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    public database: DatabaseProvider,
+    public account: AccountProvider,
+    public categoryDao: CategoryDaoProvider,
     private builder: FormBuilder
   ) {
     this.entryForm = builder.group({
@@ -56,42 +59,17 @@ export class NewEntryPage {
   }
 
   loadData() {
-    console.log("Início do Teste DB");
-
-    const sql = "SELECT * FROM categories;";
-    const data = [];
-
-    return this.database.db
-      .executeSql(sql, data)
-      .then((values: any) => {
-        let data;
-        this.categories = [];
-
-        for (var i = 0; i < values.rows.length; i++) {
-          data = values.rows.item(i);
-          console.log(JSON.stringify(data));
-          this.categories.push(data); // passando um objeto para o array
-        }
-      })
-      .catch(e =>
-        console.error(
-          "[ENTRIES] erro ao buscar registros na tabela",
-          JSON.stringify(e)
-        )
-      );
+    this.categoryDao.getAll().then((data: any[]) => {
+      this.categories = data;
+      console.log("categories", JSON.stringify(this.categories));
+    });
   }
 
   insertBD() {
-    console.log("Início da gravação do BD");
-
-    const sql = "INSERT INTO entries (amount, entry_at) VALUES (?, ?)";
-    const data = [this.entry["amount"], 1];
-
-    return this.database.db
-      .executeSql(sql, data)
-      .then(() => console.log("[ENTRIES] insert realizado com sucesso"))
-      .catch(e =>
-        console.error("[ENTRIES] erro ao inserir na tabela", JSON.stringify(e))
-      );
+    this.account
+      .addEntry(this.entry["amount"], this.entry["category_id"])
+      .then(() => {
+        console.log("[ENTRIES] insert realizado com sucesso");
+      });
   }
 }
