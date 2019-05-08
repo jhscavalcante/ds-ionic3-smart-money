@@ -1,3 +1,4 @@
+<!--
 <ion-header>
   <ion-navbar>
     <ion-title>
@@ -5,10 +6,11 @@
     </ion-title>
   </ion-navbar>
 </ion-header>
+-->
 
-<ion-content padding>
-  <h1>Saldo: R$ 2.201,45</h1>
-  <button (click)="addEntry()">Adicionar</button>
+<ion-content>
+  <!--[currentBalance] do <balance-panel> e "currentBalance" do home.ts -->
+  <balance-panel [currentBalance]="currentBalance"></balance-panel>
 
   <h3>Categorias</h3>
   <ul>

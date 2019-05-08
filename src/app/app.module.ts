@@ -16,11 +16,14 @@ import { EntryDaoProvider } from '../providers/entry-dao/entry-dao';
 import { CategoryDaoProvider } from '../providers/category-dao/category-dao';
 import { AccountProvider } from '../providers/account/account';
 
+import { ComponentsModule } from '../components/components.module'
+
 @NgModule({
   declarations: [MyApp, HomePage],
   imports: [
     BrowserModule,
     NewEntryPageModule,
+    ComponentsModule,
     IonicStorageModule.forRoot(),
     IonicModule.forRoot(MyApp)
   ],
