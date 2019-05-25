@@ -1,4 +1,6 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input } from '@angular/core';
+import { NavController } from 'ionic-angular';
+import { NewEntryPage } from '../../pages/new-entry/new-entry';
 
 @Component({
   selector: "balance-panel",
@@ -7,5 +9,9 @@ import { Component, Input } from "@angular/core";
 export class BalancePanelComponent {
   @Input() currentBalance: number;
 
-  constructor() {}
+  constructor(public navCtrl: NavController) { }
+
+  addEntry() {
+    this.navCtrl.push(NewEntryPage);
+  }
 }

@@ -28,7 +28,7 @@ export class NewEntryPage {
     public categoryDao: CategoryDaoProvider,
     private builder: FormBuilder
   ) {
-    this.entryForm = builder.group({
+    this.entryForm = this.builder.group({
       amount: new FormControl(
         "",
         Validators.compose([

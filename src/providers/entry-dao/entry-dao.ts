@@ -76,12 +76,18 @@ export class EntryDaoProvider {
 
     return this.database.db
       .executeSql(sql, data)
-      .then((data: any) => {
-        if (data.rows.length > 0) {
+      .then((dados: any) => {
+
+        //console.log(JSON.stringify(dados.rows.item(0)));
+        //if (dados.rows.length > 0) {
+        if (dados.rows.item(0).amount > 0) {
           let entries: any[] = [];
 
-          for (var i = 0; i < data.rows.length; i++) {
-            const item = data.rows.item(i);
+          for (var i = 0; i < dados.rows.length; i++) {
+            const item = dados.rows.item(i);
+
+            console.log(JSON.stringify(item));
+
             entries.push(item);
           }
           return entries;
@@ -98,13 +104,17 @@ export class EntryDaoProvider {
 
     return this.database.db
       .executeSql(sql, data)
-      .then((data: any) => {
-        if (data.rows.length > 0) {
-          const item = data.rows.item(0);
+      .then((dados: any) => {
+        console.log("GET BALANCE begin ");
+        //if (dados.rows.length > 0) {
+        //console.log(JSON.stringify(dados.rows.item(0)));
+        if (dados.rows.item(0).balance > 0) {
+          const item = dados.rows.item(0);
+          console.log("GET BALANCE " + JSON.stringify(item));
           return item.balance;
         }
 
-        return null;
+        return 0;
       })
       .catch(e =>
         console.error("[ENTRIES] erro no getBalance", JSON.stringify(e))

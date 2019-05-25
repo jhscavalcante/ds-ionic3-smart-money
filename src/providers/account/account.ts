@@ -29,10 +29,9 @@ export class AccountProvider {
 
   // Calcula o saldo no momento de inicialização da classe
   loadBalance() {
-    console.log("load balance");
-
     return this.entryDao.getBalance().then(balance => {
       this.balance = Number(balance);
+      console.log("load balance: " + this.balance);
       return this.balance;
     });
   }

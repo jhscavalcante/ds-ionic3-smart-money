@@ -15,6 +15,8 @@ export class DatabaseProvider {
   }
 
   private initDB() {
+    console.log("init db");
+
     this.sqlite
       .create({
         name: "data.db",
@@ -26,7 +28,6 @@ export class DatabaseProvider {
 
         //this.dropTables();
         this.createTables();
-        this.loadRecords();
       })
       .catch(e =>
         console.error("erro ao inicializar banco de dados", JSON.stringify(e))
@@ -34,6 +35,7 @@ export class DatabaseProvider {
   }
 
   private createTables() {
+    console.log("creating tables...");
     this.dbConnection
       .sqlBatch([
         [
@@ -43,11 +45,16 @@ export class DatabaseProvider {
           "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, amount DECIMAL NOT NULL, description TEXT, entry_at DATETIME NOT NULL, is_init BOOLEAN, category_id INTEGER);"
         ]
       ])
-      .then(() => console.log("tabelas criadas com sucesso"))
+      .then(() => {
+        console.log("tabelas criadas com sucesso");
+        this.loadRecords();
+      })
       .catch(e => console.error("erro ao criar tabelas", JSON.stringify(e)));
   }
 
   private loadRecords() {
+    console.log("loading default data ...");
+
     this.dbConnection
       .executeSql("SELECT COUNT(id) AS qtd FROM categories", [])
       .then((data: any) => {
@@ -78,10 +85,12 @@ export class DatabaseProvider {
       );
   }
 
+  /*
   private dropTables() {
     this.dbConnection
       .sqlBatch([["DROP TABLE entries;"], ["DROP TABLE categories;"]])
       .then(() => console.log("tabelas excluídas com sucesso"))
       .catch(e => console.error("erro ao excluir tabelas", JSON.stringify(e)));
   }
+  */
 }

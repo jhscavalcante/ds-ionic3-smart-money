@@ -12,17 +12,8 @@
   <!--[currentBalance] do <balance-panel> e "currentBalance" do home.ts -->
   <balance-panel [currentBalance]="currentBalance"></balance-panel>
 
-  <h3>Categorias</h3>
-  <ul>
-    <li>Alimentação: R$ 200,00</li>
-    <li>Combustível: R$ 12,00</li>
-    <li>Aluguel: R$ 120,00</li>
-  </ul>
-
-  <h3>Últimos Lançamentos</h3>
-  <ul>
-    <li *ngFor="let entry of entries">
-      {{ entry.description }}: {{ entry.amount | currency }}
-    </li>
-  </ul>
+  <entry-summary></entry-summary>
+  <entry-list [entries]="entries"></entry-list>
+  <button (click)="loadData()">Teste de Banco de Dados</button>
+  <button (click)="addEntry()">Adicionar reg</button>
 </ion-content>
